@@ -350,6 +350,23 @@ impl Extend<(String, Value)> for Map<String, Value> {
     }
 }
 
+impl Map<String, Value> {
+    pub fn extend_recurse_tables<T>(&mut self, iter: T)
+    where
+        T: IntoIterator<Item = (String, Value)>,
+    {
+        for (key, value) in iter {
+            if let Value::Table(table) = &value {
+                if let Some(Value::Table(table_to_extend)) = self.map.get_mut(&key) {
+                    table_to_extend.extend_recurse_tables(table.clone());
+                    return;
+                }
+            }
+            self.map.insert(key, value);
+        }
+    }
+}
+
 macro_rules! delegate_iterator {
     (($name:ident $($generics:tt)*) => $item:ty) => {
         impl $($generics)* Iterator for $name $($generics)* {
