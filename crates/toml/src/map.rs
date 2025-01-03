@@ -359,7 +359,7 @@ impl Map<String, Value> {
             if let Value::Table(table) = &value {
                 if let Some(Value::Table(table_to_extend)) = self.map.get_mut(&key) {
                     table_to_extend.extend_recurse_tables(table.clone());
-                    return;
+                    continue;
                 }
             }
             self.map.insert(key, value);
